@@ -4,7 +4,6 @@ const showSignin = (req, res) => {
 };
 const handleSignin = (req, res) => {
     const body = req.body;
-    console.log(body);
     // 调用Models中验证邮箱的方法
     m_user.checkEmail(body.email, (err, data) => {
         if (err) {
@@ -25,12 +24,18 @@ const handleSignin = (req, res) => {
                 message: '密码错误'
             });
         }
+        req.session.user = data[0];
         res.send({
             code: 200,
             message: '可以跳转了'
         });
     });
 };
+const handleSignout = (req,res)=>{
+    delete req.session.user;
+    res.redirect('/signin');
+};
 
 exports.showSignin = showSignin;
 exports.handleSignin = handleSignin;
+exports.handleSignout = handleSignout;
