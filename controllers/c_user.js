@@ -31,7 +31,7 @@ const handleSignin = (req, res) => {
         });
     });
 };
-const handleSignout = (req,res)=>{
+const handleSignout = (req, res) => {
     delete req.session.user;
     res.redirect('/signin');
 };
@@ -39,3 +39,53 @@ const handleSignout = (req,res)=>{
 exports.showSignin = showSignin;
 exports.handleSignin = handleSignin;
 exports.handleSignout = handleSignout;
+
+exports.showSignup = (req, res) => {
+    res.render('signup.html');
+};
+
+exports.handleSignup = (req, res) => {
+    const body = req.body;
+    m_user.checkEmail(body.email, (err, data) => {
+        if (err) {
+            return res.send({
+                code: 500,
+                message: err.message
+            });
+        }
+        if (data[0]) {
+            return res.send({
+                code: 1,
+                message: '邮箱已存在'
+            });
+        }
+        //验证昵称是否存在
+        m_user.checkNickname(body.nickname, (err, data) => {
+            if (err) {
+                return res.send({
+                    code: 500,
+                    message: err.message
+                })
+            }
+            if (data[0]) {
+                return res.send({
+                    code: 2,
+                    message: '昵称已存在'
+                });
+            }
+            //添加用户到数据库
+            m_user.addUser(body, (err, data) => {
+                if (err) {
+                    return res.send({
+                        code: 500,
+                        message: err.message
+                    });
+                }
+                res.send({
+                    code: 200,
+                    message: '注册成功'
+                })
+            });
+        });
+    });
+};

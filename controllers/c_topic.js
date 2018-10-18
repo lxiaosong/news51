@@ -46,7 +46,57 @@ exports.showDetail = (req, res) => {
             });
         }
         res.render('topic/show.html', {
+            topic: data[0],
+            sessionUserId: req.session.user.id
+        });
+    });
+};
+//渲染话题编辑页面
+exports.showEdit = (req, res) => {
+    const topicID = req.params.topicID;
+    const body = req.body;
+    m_topic.findTopicByID(topicID, (err, data) => {
+        if (err) {
+            return res.send({
+                code: 500,
+                message: err.message
+            })
+        }
+        res.render('topic/edit.html', {
             topic: data[0]
+        });
+    });
+};
+//处理编辑页面的表单请求
+exports.handleEditTopic = (req, res) => {
+    const body = req.body;
+    const topicID = req.params.topicID;
+    m_topic.updateTopicById(topicID, body, (err, data) => {
+        if (err) {
+            return res.send({
+                code: 500,
+                message: '服务器错误'
+            })
+        }
+        return res.send({
+            code: 200,
+            message: '编辑成功'
+        })
+    });
+};
+//删除话题
+exports.deleteTopic = (req, res) => {
+    const topicID = req.params.topicID;
+    m_topic.deleteTopicById(topicID, (err, data) => {
+        if(err){
+            return res.send({
+                code: 500,
+                message: err.message
+            });
+        }
+        return res.send({
+            code: 200,
+            message: '删除成功'
         });
     });
 };
